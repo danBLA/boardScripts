@@ -24,5 +24,6 @@ print("dy="+str(solid.getDy()))
 print("dz="+str(solid.getDz()))
 
 domain = Domain(solid)
+domain.writeBlockDict()
 
 print domain

@@ -1,3 +1,4 @@
+import os
 import math
 import Solid
 class Domain(object):
@@ -82,3 +83,51 @@ class Domain(object):
 
     def getNz(self):
         return self._nz
+
+    def writeBlockDict(self,targetDir="."):
+        path_filename=os.path.abspath(__file__)
+        sourcedir = os.path.split(path_filename)[0]
+
+        template = open(os.path.join(*[sourcedir,"..","templates","blockMeshDict"]),'r')
+        target   = open(os.path.join(targetDir,"blockMeshDict"),'w')
+
+        for line in template:
+            if "{VERTICES}" in line:
+                self.writeVertices(target)
+            elif "{BLOCKS}" in line:
+                self.writeBlock(target)
+            else:
+                target.write(line)
+
+        template.close()
+        target.close()
+
+    def writeVertices(self,outfile):
+        x0 = str(self.getXmin())
+        x1 = str(self.getXmax())
+        y0 = str(self.getYmin())
+        y1 = str(self.getYmax())
+        z0 = str(self.getZmin())
+        z1 = str(self.getZmax())
+        outfile.write("vertices\n")
+        outfile.write("(\n")
+        outfile.write("   ("+x0+" "+y0+" "+z0+")\n")
+        outfile.write("   ("+x1+" "+y0+" "+z0+")\n")
+        outfile.write("   ("+x1+" "+y1+" "+z0+")\n")
+        outfile.write("   ("+x0+" "+y1+" "+z0+")\n")
+        outfile.write("   ("+x0+" "+y0+" "+z1+")\n")
+        outfile.write("   ("+x1+" "+y0+" "+z1+")\n")
+        outfile.write("   ("+x1+" "+y1+" "+z1+")\n")
+        outfile.write("   ("+x0+" "+y1+" "+z1+")\n")
+        outfile.write(");\n")
+
+    def writeBlock(self,outfile):
+        nx = str(self.getNx())
+        ny = str(self.getNy())
+        nz = str(self.getNz())
+        outfile.write("blocks\n")
+        outfile.write("(\n")
+        outfile.write("   hex (0 1 2 3 4 5 6 7)")
+        outfile.write(" ("+nx+" "+ny+" "+nz+")")
+        outfile.write(" simpleGrading (1 1 1)\n")
+        outfile.write(");\n")
