@@ -8,22 +8,19 @@ executablesDir = os.path.split(path_filename)[0]
 sys.path.insert(0,os.path.join(executablesDir,"python"))
 
 # user defined classes
-from Solid import *
-from Domain import *
+from Project import *
+from ProjectManager import *
 
-solid = createSolidFromSTL("g6_schwert.stl")
+#project = Project()
+#
+#project.setSolidFile("g6_schwert.stl")
+#project.setObjeScaling("0.001")
+#project.prepare()
+#project.create()
+#print(project)
+#project.createGrid()
 
-solid.scale(0.001)
-solid.writeToFile("scaled.stl")
-
-solid.repair()
-solid.writeToFile("end.stl")
-
-print("dx="+str(solid.getDx()))
-print("dy="+str(solid.getDy()))
-print("dz="+str(solid.getDz()))
-
-domain = Domain(solid)
-domain.writeBlockDict()
-
-print domain
+manager = ProjectManager()
+manager.prepare()
+manager.createProjects()
+manager.selectProjectToRun()

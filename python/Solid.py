@@ -3,12 +3,24 @@ import os
 import help_functions as hf
 
 class Solid(object):
-    def __init__(self,name):
-       self.reset()
+    def __init__(self,name,filename):
        self._name = name
+       self._filename = filename
+       self._freeze = False
+       self.reset()
+
+    def freeze(self):
+        self._freeze = True
+
+    def getSTLName(self):
+       return self._filename
 
     def reset(self):
-       self._name = "undefined"
+       if self._freeze:
+           print("ERROR: Solid can not be changed!")
+           print("       (function reset())")
+           hf.flush_output()
+           hf.exit(1)
        self._nTriangles = 0
        self._nVertices  = 0
        self._pointsX = []
@@ -19,12 +31,22 @@ class Solid(object):
        self._normalZ = []
 
     def addPoint(self,x,y,z):
+        if self._freeze:
+           print("ERROR: Solid can not be changed!")
+           print("       (function addPoint())")
+           hf.flush_output()
+           hf.exit(1)
         self._pointsX.append(float(x))
         self._pointsY.append(float(y))
         self._pointsZ.append(float(z))
         self._nVertices += 1
 
     def addTriangle(self,nx,ny,nz):
+        if self._freeze:
+           print("ERROR: Solid can not be changed!")
+           print("       (function addTriangle())")
+           hf.flush_output()
+           hf.exit(1)
         self._normalX.append(float(nx))
         self._normalY.append(float(ny))
         self._normalZ.append(float(nz))
@@ -61,6 +83,11 @@ class Solid(object):
         return self.getZmax() - self.getZmin()
 
     def move(self,dx,dy,dz):
+        if self._freeze:
+           print("ERROR: Solid can not be changed!")
+           print("       (function move())")
+           hf.flush_output()
+           hf.exit(1)
         print("Moving solid \""+self._name+"\" by (dx/dy/dz): "+str(dx)+","+str(dy)+","+str(dz))
         for i, [x,y,z] in enumerate(zip(self._pointsX,self._pointsY,self._pointsZ)):
             self._pointsX[i] = x + float(dx)
@@ -68,6 +95,11 @@ class Solid(object):
             self._pointsZ[i] = z + float(dz)
 
     def scale(self,factor):
+        if self._freeze:
+           print("ERROR: Solid can not be changed!")
+           print("       (function scale())")
+           hf.flush_output()
+           hf.exit(1)
         print("Scaling solid \""+self._name+"\" by factor: "+str(factor))
         for i, [x,y,z] in enumerate(zip(self._pointsX,self._pointsY,self._pointsZ)):
             self._pointsX[i] = float(factor)*x
@@ -75,6 +107,11 @@ class Solid(object):
             self._pointsZ[i] = float(factor)*z
 
     def rotate(self,beta,axis):
+        if self._freeze:
+           print("ERROR: Solid can not be changed!")
+           print("       (function rotate())")
+           hf.flush_output()
+           hf.exit(1)
         print("Rotating solid \""+self._name+"\" by angle: "+str(beta)+" around "+axis.upper()+"-axis")
         alpha  = math.radians(float(beta))
         matrix = [[math.cos(alpha),-math.sin(alpha)],[math.sin(alpha),math.cos(alpha)]]
@@ -120,15 +157,30 @@ class Solid(object):
            sys.exit(1)
 
         for i in xrange(0,self._nTriangles):
-            stl.write("  facet normal  "+str(self._normalX[i])+" "+str(self._normalY[i])+" "+str(self._normalZ[i])+"\n")
+            #stl.write(("  facet normal  "
+            #           +    str(self._normalX[i])
+            #           +" "+str(self._normalY[i])
+            #           +" "+str(self._normalZ[i])
+            #           +"\n"))
+            stl.write(" facet normal  {:e} {:e} {:e}\n".format(self._normalX[i],self._normalY[i],self._normalZ[i]))
             stl.write("    outer loop\n")
             for j in xrange(0,3):
-                stl.write("      vertex  "+str(self._pointsX[3*i+j])+" "+str(self._pointsY[3*i+j])+" "+str(self._pointsZ[3*i+j])+"\n")
+                stl.write("      vertex  {:e} {:e} {:e}\n".format(self._pointsX[3*i+j],self._pointsY[3*i+j],self._pointsZ[3*i+j]))
+            #    stl.write(("      vertex  "
+            #                 +    str(self._pointsX[3*i+j])
+            #                 +" "+str(self._pointsY[3*i+j])
+            #                 +" "+str(self._pointsZ[3*i+j])
+            #                 +"\n"))
             stl.write("    endloop\n")
             stl.write("  endfacet\n")
         stl.write("endsolid\n")
 
-    def repair(self):
+    def repairAndWriteToFile(self,filename,directory="stl_final"):
+        if self._freeze:
+           print("ERROR: Solid can not be changed!")
+           print("       (function repair())")
+           hf.flush_output()
+           hf.exit(1)
         path_filename=os.path.abspath(__file__)
         executablesDir = os.path.split(path_filename)[0]
         self.writeToFile("tmp.stl",".")
@@ -140,6 +192,40 @@ class Solid(object):
 
         hf.run(command)
 
+        stl = open(os.path.join(directory,filename),'w')
+
+        for line in open("tmp1.stl"):
+            elements = line.lower().split()
+            if elements[0] == "solid":
+               stl.write("solid "+self._name+"\n")
+            elif elements[0] == "endsolid":
+               stl.write("endsolid "+self._name+"\n")
+            else:
+               stl.write(line)
+
+        stl.close()
+
+        os.remove("tmp.stl")
+        os.remove("tmp1.stl")
+
+    def repair(self):
+        if self._freeze:
+           print("ERROR: Solid can not be changed!")
+           print("       (function repair())")
+           hf.flush_output()
+           hf.exit(1)
+        path_filename=os.path.abspath(__file__)
+        executablesDir = os.path.split(path_filename)[0]
+        self.writeToFile("tmp.stl",".")
+        command = []
+        command.append(os.path.join(executablesDir,"admesh"))
+        command.append("-nufdv")
+        command.append("--write-ascii-stl=tmp1.stl")
+        command.append("tmp.stl")
+
+        hf.run(command)
+
+        self.reset()
         for line in open("tmp1.stl"):
             elements = line.lower().split()
             if elements[0] == "solid":
@@ -153,21 +239,21 @@ class Solid(object):
         os.remove("tmp1.stl")
 
 
-def createSolidsFromSTL(filename,directory="stl_original"):
+def createSolidsFromSTL(filename,directory="geometries"):
     solids = []
     solid = None
     for line in open(os.path.join(directory,filename)):
        elements = line.lower().split()
        if elements[0] == "solid":
-           solid = Solid(elements[1])
+           solid = Solid(elements[1],filename)
            solids.append(solid)
-       if elements[0] == "facet":
-           solid.addTriangle(elements[2],elements[3],elements[4])
-       if elements[0] == "vertex":
-           solid.addPoint(elements[1],elements[2],elements[3])
+       elif elements[0] == "facet":
+           solid.addTriangle(float(elements[2]),float(elements[3]),float(elements[4]))
+       elif elements[0] == "vertex":
+           solid.addPoint(float(elements[1]),float(elements[2]),float(elements[3]))
     return solids
 
-def createSolidFromSTL(filename,directory="stl_original"):
+def createSolidFromSTL(filename,directory="geometries"):
     solids = createSolidsFromSTL(filename,directory)
     if not len(solids) == 1:
         print("ERROR reading file: "+filename)
