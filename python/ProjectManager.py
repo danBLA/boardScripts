@@ -87,10 +87,10 @@ class ProjectManager(object):
             for i in range(len(self._projectlist)):
                 self._projectlist[i].copyMesh()
         else:
-            self._projectlist[i].create()
-            self._projectlist[i].createGrid()
-            self._projectlist[i].checkGrid()
-            self._projectlist[i].copyMesh()
+            self._projectlist[userchoice].create()
+            self._projectlist[userchoice].createGrid()
+            self._projectlist[userchoice].checkGrid()
+            self._projectlist[userchoice].copyMesh()
 
         self.selectProjectToRun()
 
