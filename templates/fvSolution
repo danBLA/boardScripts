@@ -62,18 +62,15 @@ SIMPLE
 {
     nNonOrthogonalCorrectors 0;
 
-    // Residual here (all residuals must go below this)
-    convergenceCriterion 1.0e-7;
-
     // Residuals here (one per variable)
     // If one variable is not specified, zero is assumed as
     // desired residual (iterations will not stop)
-    // residualControl
-    // {
-    //     p               1e-7;
-    //     U               1e-7;
-    //     "(k|omega)" 1e-7;
-    // }
+    residualControl
+    {
+        p               1e-7;
+        U               1e-7;
+        "(k|omega)" 1e-7;
+    }
 }
 
 relaxationFactors
