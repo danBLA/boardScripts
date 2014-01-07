@@ -19,7 +19,7 @@ solvers
     p
     {
         solver           GAMG;
-        tolerance        1e-8;
+        tolerance        1e-12;
         relTol           0.01;
         smoother         GaussSeidel;
         nPreSweeps       0;
@@ -34,7 +34,8 @@ solvers
     {
         solver           smoothSolver;
         smoother         GaussSeidel;
-        tolerance        1e-8;
+        //tolerance        1e-8;
+        tolerance        1e-12;
         relTol           0.1;
         nSweeps          1;
     }
@@ -43,7 +44,8 @@ solvers
     {
         solver           smoothSolver;
         smoother         GaussSeidel;
-        tolerance        1e-8;
+        //tolerance        1e-8;
+        tolerance        1e-12;
         relTol           0.1;
         nSweeps          1;
     }
@@ -52,7 +54,8 @@ solvers
     {
         solver           smoothSolver;
         smoother         GaussSeidel;
-        tolerance        1e-8;
+        //tolerance        1e-8;
+        tolerance        1e-12;
         relTol           0.1;
         nSweeps          1;
     }
@@ -67,7 +70,7 @@ SIMPLE
     // desired residual (iterations will not stop)
     residualControl
     {
-        p               1e-6;
+        p               5e-6;
         U               1e-7;
         "(k|omega)" 1e-7;
     }
