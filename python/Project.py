@@ -265,3 +265,16 @@ class Project(object):
    def __str__(self):
        return self.statusInfo()
 
+   def __eq__(self,other):
+       if (     self._solidfile    == other._solidfile
+           and  self._refsolidfile == other._refsolidfile
+           and  self._scale        == other._scale
+           and  self._rotX         == other._rotX
+           and  self._rotY         == other._rotY
+           and  self._rotZ         == other._rotZ
+           and  self._speedknots   == other._speedknots):
+           return True
+       else:
+           return False
+   def __ne__(self,other):
+       return (not self.__eq__(other))

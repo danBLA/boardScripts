@@ -22,5 +22,7 @@ from ProjectManager import *
 
 manager = ProjectManager()
 manager.prepare()
-manager.createProjects()
-manager.selectProjectToRun()
+manager.run()
+#manager.selectGeometry()
+#manager.createProjects()
+#manager.selectProjectToRun()

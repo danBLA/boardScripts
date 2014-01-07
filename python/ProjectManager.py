@@ -4,6 +4,8 @@ class ProjectManager(object):
     def __init__(self):
         self._configurations = []
         self._geometries = []
+        self._selected_geometries = []
+        self._selected_configurations = []
         self._projectlist = []
 
     def searchCFGfiles(self,directory):
@@ -40,9 +42,187 @@ class ProjectManager(object):
                 self._geometries.append(gCFG)
         print("Geometry configurations found: "+str(len(self._geometries)))
 
+    def run(self):
+        print("===============================")
+        print("= Project configuration       =")
+        print("===============================")
+        print("")
+        print("Geometries loaded:")
+        if self._selected_geometries:
+           for item in self._selected_geometries:
+              print("* "+str(item))
+        else:
+           print("* none")
+        print("Configurations loaded:")
+        if self._selected_configurations:
+           for item in self._selected_configurations:
+              print("* "+str(item))
+        else:
+           print("* none")
+
+        print("")
+        questionair = {}
+        print("1: load geometry")
+        questionair["1"] = self.loadGeometry
+        print("2: remove geometry")
+        questionair["2"] = self.removeGeometry
+        print("3: load configuration")
+        questionair["3"] = self.loadConfiguration
+        print("4: remove configuration")
+        questionair["4"] = self.removeConfiguration
+        print("5: create projects")
+        questionair["5"] = self.createProjects
+        print("x: exit")
+        questionair["x"] = self.exit
+
+        userchoice = self.query_project("Please select: ",questionair)
+        userchoice()
+
+    def exit(self):
+        hf.exit(0)
+    def pleasedefine(self):
+        print("please define this function...")
+        self.run()
+
+    def loadGeometry(self):
+        if len(self._geometries) == len(self._selected_geometries):
+           print("All possible geometries are already loaded...")
+           self.run()
+        print("Geometries:")
+
+        print("")
+        questionair = {}
+
+        j=-1
+        for i in xrange(len(self._geometries)):
+           if not self._geometries[i] in self._selected_geometries:
+              j += 1
+              print(str(j)+": "+str(self._geometries[i]))
+              questionair[str(j)] = i
+           else:
+              print("*"   +": "+str(self._geometries[i]))
+
+        print("")
+        print("a: all")
+        questionair["a"] = -1
+        print("b: back")
+        questionair["b"] = -2
+        userchoice = self.query_project("Please select: ",questionair)
+        if userchoice == -1:
+           for i in xrange(len(self._geometries)):
+              if not self._geometries[i] in self._selected_geometries:
+                 self._selected_geometries.append(self._geometries[i])
+           self.run()
+        if userchoice == -2:
+           self.run()
+        else:
+           self._selected_geometries.append(self._geometries[userchoice])
+           self.loadGeometry()
+
+    def removeGeometry(self):
+        if len(self._selected_geometries) < 1:
+           print("No geometry is currently loaded...")
+           self.run()
+        print("Geometries:")
+
+        print("")
+        questionair = {}
+
+        j=-1
+        for i in xrange(len(self._geometries)):
+           if self._geometries[i] in self._selected_geometries:
+              j += 1
+              print(str(j)+": "+str(self._geometries[i]))
+              questionair[str(j)] = i
+           else:
+              print("*"   +": "+str(self._geometries[i]))
+
+        print("")
+        print("a: all")
+        questionair["a"] = -1
+        print("b: back")
+        questionair["b"] = -2
+        userchoice = self.query_project("Please select: ",questionair)
+        if userchoice == -1:
+           self._selected_geometries = []
+           self.run()
+        if userchoice == -2:
+           self.run()
+        else:
+           self._selected_geometries.remove(self._geometries[userchoice])
+           self.removeGeometry()
+
+    def loadConfiguration(self):
+        if len(self._configurations) == len(self._selected_configurations):
+           print("All possible configurations are already loaded...")
+           self.run()
+        print("Configurations:")
+
+        print("")
+        questionair = {}
+
+        j=-1
+        for i in xrange(len(self._configurations)):
+           if not self._configurations[i] in self._selected_configurations:
+              j += 1
+              print(str(j)+": "+str(self._configurations[i]))
+              questionair[str(j)] = i
+           else:
+              print("*"   +": "+str(self._configurations[i]))
+
+        print("")
+        print("a: all")
+        questionair["a"] = -1
+        print("b: back")
+        questionair["b"] = -2
+        userchoice = self.query_project("Please select: ",questionair)
+        if userchoice == -1:
+           for i in xrange(len(self._configurations)):
+              if not self._configurations[i] in self._selected_configurations:
+                 self._selected_configurations.append(self._configurations[i])
+           self.run()
+        if userchoice == -2:
+           self.run()
+        else:
+           self._selected_configurations.append(self._configurations[userchoice])
+           self.loadConfiguration()
+
+    def removeConfiguration(self):
+        if len(self._selected_configurations) < 1:
+           print("No configuration is currently loaded...")
+           self.run()
+        print("Configurations:")
+
+        print("")
+        questionair = {}
+
+        j=-1
+        for i in xrange(len(self._configurations)):
+           if self._configurations[i] in self._selected_configurations:
+              j += 1
+              print(str(j)+": "+str(self._configurations[i]))
+              questionair[str(j)] = i
+           else:
+              print("*"   +": "+str(self._configurations[i]))
+
+        print("")
+        print("a: all")
+        questionair["a"] = -1
+        print("b: back")
+        questionair["b"] = -2
+        userchoice = self.query_project("Please select: ",questionair)
+        if userchoice == -1:
+           self._selected_configurations = []
+           self.run()
+        if userchoice == -2:
+           self.run()
+        else:
+           self._selected_configurations.remove(self._configurations[userchoice])
+           self.removeConfigurations()
+
     def createProjects(self):
-       for sCFG in self._configurations:
-           for gCFG in self._geometries:
+       for sCFG in self._selected_configurations:
+           for gCFG in self._selected_geometries:
                project = Project.Project()
 
                project.setSolidFile(gCFG.getGeometrySTL())
@@ -53,30 +233,33 @@ class ProjectManager(object):
                project.setObjeRotZ(sCFG.getZrotation())
                project.setFluidVelInKnots(sCFG.getSpeed())
 
-               project.prepare()
-               self._projectlist.append(project)
+               if not project in self._projectlist:
+                  project.prepare()
+                  self._projectlist.append(project)
+
+       self.selectProjectToRun()
 
     def selectProjectToRun(self):
         print("===============================")
         print("= Select a project to prepare =")
-        print("===============================")
+        print("===============================\n")
 
         questionair = {}
         for i in range(len(self._projectlist)):
-            #print("-------")
-            #print("-- "+str(i)+" --")
-            #print("-------")
-            #print self._projectlist[i]
             print("("+str(i)+") "+self._projectlist[i].statusShort())
             questionair[str(i)] = i
 
-        print("(a) to prepare all projects\n")
+        print("a: to prepare all projects")
         questionair["a"] = -1
-        print("(x) to exit\n")
+        print("b: back")
+        questionair["b"] = -3
+        print("x: to exit")
         questionair["x"] = -2
-        userchoice = self.query_project("Please select project number of 'a' or 'x': ",questionair)
+        userchoice = self.query_project("Please select: ",questionair)
 
-        if userchoice == -2:
+        if userchoice == -3:
+            self.run()
+        elif userchoice == -2:
             hf.exit(0)
         elif userchoice == -1:
             for i in range(len(self._projectlist)):
@@ -116,6 +299,12 @@ class simCFG(object):
         self._Yrotation = 0.0
         self._Zrotation = 0.0
         self.readCFG(os.path.join(directory,cfgfile))
+    def __str__(self):
+        string  =      str(self._speed    )+" kns"
+        string += ", "+str(self._Xrotation)+" Xrot"
+        string += ", "+str(self._Yrotation)+" Yrot"
+        string += ", "+str(self._Zrotation)+" Zrot"
+        return string
     def getSpeed(self):
         return self._speed
     def getXrotation(self):
@@ -144,10 +333,14 @@ class simCFG(object):
       config.read(filename)
       if config.has_section('VELOCITY'):    
          self._speed = float(hf.read_key(config,'VELOCITY','speed',0.0))
+      else:
+         print("no velocity section found")
       if config.has_section('ROTATION'):    
          self._Xrotation = float(hf.read_key(config,'ROTATION','Xrotation',0.0))
          self._Yrotation = float(hf.read_key(config,'ROTATION','Yrotation',0.0))
          self._Zrotation = float(hf.read_key(config,'ROTATION','Zrotation',0.0))
+      else:
+         print("no rotation section found")
 
 
 class geomCFG(object):
@@ -157,6 +350,11 @@ class geomCFG(object):
         self._refGeometrySTL = ""
         self._scale = 1.0
         self.readCFG(os.path.join(directory,cfgfile))
+    def __str__(self):
+        string  =  str(self._scale)+" scale"
+        string += ", "+self._geometrySTL
+        string += ", "+self._refGeometrySTL
+        return string
     def getGeometrySTL(self):
         return self._geometrySTL
     def getRefGeometrySTL(self):
@@ -185,7 +383,6 @@ class geomCFG(object):
          self._scale = float(hf.read_key(config,'GEOMETRY','scale',1.0))
          self._geometrySTL = hf.read_key(config,'GEOMETRY','solid',"")
          self._refGeometrySTL = hf.read_key(config,'GEOMETRY','refsolid',"")
-         print("geometry section found")
       else:
          print("no geometry section found")
 
