@@ -6,8 +6,8 @@ class Domain(object):
     def __init__(self,snappydir):
         self._solid = None
 
-        self._facXmin =  3.3
-        self._facXmax = 19.0
+        self._facXmin = 19.0
+        self._facXmax =  3.3
         self._facY    =  1.5
         self._facZ    =  1.0
 
