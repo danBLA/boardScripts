@@ -7,6 +7,7 @@ class ProjectManager(object):
         self._selected_geometries = []
         self._selected_configurations = []
         self._projectlist = []
+        self._active_projectlist = []
 
     def searchCFGfiles(self,directory):
         from os import listdir
@@ -236,13 +237,76 @@ class ProjectManager(object):
                if not project in self._projectlist:
                   project.prepare()
                   self._projectlist.append(project)
+                  self._active_projectlist.append(project)
 
-       self.selectProjectToRun()
+       #self.selectProjectToRun()
+       self.baseProjectPage()
 
-    def selectProjectToRun(self):
-        print("===============================")
-        print("= Select a project to prepare =")
-        print("===============================\n")
+    def baseProjectPage(self):
+        print("=============")
+        print("= Projects  =")
+        print("=============\n")
+
+        questionair = {}
+        print("Active Projects:")
+        j = -1
+        for i in range(len(self._projectlist)):
+            if self._projectlist[i] in self._active_projectlist:
+               j += 1
+               print("("+str(j)+") "+self._projectlist[i].statusShort())
+               questionair[str(j)] = i
+
+        print("\nInctive Projects:")
+        for i in range(len(self._projectlist)):
+            if self._projectlist[i] not in self._active_projectlist:
+               j += 1
+               print("("+str(j)+") "+self._projectlist[i].statusShort())
+               questionair[str(j)] = i
+
+        print("\na: prepare all active projects")
+        questionair["a"] = -1
+        print("c: prepare all active projects without grid check")
+        questionair["c"] = -4
+        print("b: back")
+        questionair["b"] = -3
+        print("x: to exit")
+        questionair["x"] = -2
+        userchoice = self.query_project("Select project to switch active/inactive or a/c/b/x: ",questionair)
+
+        if userchoice == -3:
+            self.run()
+        elif userchoice == -2:
+            hf.exit(0)
+        elif userchoice == -1:
+            for i in range(len(self._active_projectlist)):
+                self._active_projectlist[i].create()
+                self._active_projectlist[i].createGrid()
+            for i in range(len(self._active_projectlist)):
+                self._active_projectlist[i].checkGrid()
+            for i in range(len(self._active_projectlist)):
+                self._active_projectlist[i].copyMesh()
+        elif userchoice == -4:
+            for i in range(len(self._active_projectlist)):
+                self._active_projectlist[i].create()
+                self._active_projectlist[i].createGrid()
+            for i in range(len(self._active_projectlist)):
+                self._active_projectlist[i].copyMesh()
+        else:
+            if self._projectlist[userchoice] in self._active_projectlist:
+               self._active_projectlist.remove(self._projectlist[userchoice])
+            else:
+               self._active_projectlist.append(self._projectlist[userchoice])
+        self.baseProjectPage()
+
+    def selectProjectToRun(self,withGridCheck=True):
+        if withGridCheck:
+           print("===============================")
+           print("= Select a project to prepare =")
+           print("===============================\n")
+        else:
+           print("==================================================")
+           print("= Select a project to prepare without grid check =")
+           print("==================================================\n")
 
         questionair = {}
         for i in range(len(self._projectlist)):
@@ -265,14 +329,16 @@ class ProjectManager(object):
             for i in range(len(self._projectlist)):
                 self._projectlist[i].create()
                 self._projectlist[i].createGrid()
-            for i in range(len(self._projectlist)):
-                self._projectlist[i].checkGrid()
+            if withGridCheck:
+               for i in range(len(self._projectlist)):
+                   self._projectlist[i].checkGrid()
             for i in range(len(self._projectlist)):
                 self._projectlist[i].copyMesh()
         else:
             self._projectlist[userchoice].create()
             self._projectlist[userchoice].createGrid()
-            self._projectlist[userchoice].checkGrid()
+            if withGridCheck:
+               self._projectlist[userchoice].checkGrid()
             self._projectlist[userchoice].copyMesh()
 
         self.selectProjectToRun()

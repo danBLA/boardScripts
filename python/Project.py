@@ -247,8 +247,7 @@ class Project(object):
        string = self._simple.laststep(string)
        string  =(   "Project: "+self._projectname
                 +" -> last step: "+string
-                +" -> ready2run: "+str(self._simple.meshCopied())
-                +"\n")
+                +" -> ready2run: "+str(self._simple.meshCopied()))
        return string
    def statusInfo(self):
        string  =   "Project: "+self._projectname+"\n"
