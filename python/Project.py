@@ -81,9 +81,9 @@ class Project(object):
 
    def copyMesh(self):
        if not self._snappy.meshChecked():
-           print("Please first create and check mesh")
-       else:
-           self._simple.copyMesh()
+           print("Warning:")
+           print("Copy mesh without check")
+       self._simple.copyMesh()
 
    def writeAllFiles(self):   
        self.checkFolders()
