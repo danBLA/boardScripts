@@ -28,6 +28,7 @@ FoamFile
         // - 180: selects all edges
         //includedAngle   150;
         includedAngle   170;
+        //includedAngle   175;
     }
 
     // Write options
