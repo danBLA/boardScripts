@@ -12,8 +12,10 @@ class Project(object):
    def __init__(self):
        self._solid            = None
        self._refsolid         = None
+       self._edgesolid        = None
        self._solidfile        = ""
        self._refsolidfile     = ""
+       self._edgesolidfile    = ""
        self._projectdir       = ""
        self._projectname      = ""
        self._snappyHexMeshDir = ""
@@ -37,7 +39,8 @@ class Project(object):
        self._simple = Simple.Simple(self._simpleFoamDir,self._snappyHexMeshDir)
 
        # read/load solid
-       if self._snappy.solidWritten():
+       if self._snappy.solidWritten() and not self._solidfile:
+           print "Loading Solid from snappyHexMesh"
            [self._solid, self._refsolid] = self._snappy.loadSolid()
        else:
            # check if solid file exists
@@ -47,9 +50,14 @@ class Project(object):
            self.checkSolidFile(self._refsolidfile)
            self._refsolid = Solid.createSolidFromSTL(self._refsolidfile)
 
+           if self._edgesolidfile:
+              self.checkSolidFile(self._edgesolidfile)
+              self._edgesolid = Solid.createSolidFromSTL(self._edgesolidfile)
+
        # assign solid to snappy/domain-object
        self._snappy.setsolid(self._solid)
        self._snappy.setRefsolid(self._refsolid)
+       self._snappy.setEdgesolid(self._edgesolid)
        self._domain.setsolid(self._solid)
 
        self._simple.setVelocityKnots(self._speedknots)
@@ -92,6 +100,8 @@ class Project(object):
        if not self._snappy.solidWritten():
            self.transformSolid(self._solid)
            self.transformSolid(self._refsolid)
+           if self._edgesolid:
+              self.transformSolid(self._edgesolid)
            self._snappy.writeSolid()
 
        # set solid again so that the domain is
@@ -225,6 +235,9 @@ class Project(object):
    def setRefSolidFile(self,filename):
        self._refsolidfile = filename
 
+   def setEdgeSolidFile(self,filename):
+       self._edgesolidfile = filename
+
    def setObjeScaling(self,scale):
        self._scale = scale
 
@@ -265,13 +278,14 @@ class Project(object):
        return self.statusInfo()
 
    def __eq__(self,other):
-       if (     self._solidfile    == other._solidfile
-           and  self._refsolidfile == other._refsolidfile
-           and  self._scale        == other._scale
-           and  self._rotX         == other._rotX
-           and  self._rotY         == other._rotY
-           and  self._rotZ         == other._rotZ
-           and  self._speedknots   == other._speedknots):
+       if (     self._solidfile     == other._solidfile
+           and  self._refsolidfile  == other._refsolidfile
+           and  self._edgesolidfile == other._edgesolidfile
+           and  self._scale         == other._scale
+           and  self._rotX          == other._rotX
+           and  self._rotY          == other._rotY
+           and  self._rotZ          == other._rotZ
+           and  self._speedknots    == other._speedknots):
            return True
        else:
            return False

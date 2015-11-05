@@ -3,8 +3,9 @@ import os
 import help_functions as hf
 class Snappy(object):
     def __init__(self,snappydir):
-        self._solid    = None
-        self._refsolid = None
+        self._solid     = None
+        self._refsolid  = None
+        self._edgesolid = None
 
         self._snappydir     = snappydir
         self._constantdir   = os.path.join(snappydir,"constant")
@@ -97,6 +98,9 @@ class Snappy(object):
     def setRefsolid(self,solid):
         self._refsolid = solid
 
+    def setEdgesolid(self,solid):
+        self._edgesolid = solid
+
     def checksolid(self,whichfunction):
         if not self._solid:
             print("ERROR: Snappy -> no solid defined!")
@@ -119,6 +123,10 @@ class Snappy(object):
             self._refsolid.repairAndWriteToFile(self._refsolid.getSTLName(),self._triSurfacedir)
             pickle.dump(self._refsolid,open(os.path.join(self._triSurfacedir,"refsurface.p"),"wb"))
 
+            if self._edgesolid:
+               self._edgesolid.repairAndWriteToFile(self._edgesolid.getSTLName(),self._triSurfacedir)
+               pickle.dump(self._edgesolid,open(os.path.join(self._triSurfacedir,"edgesurface.p"),"wb"))
+
             self.setSolidWritten()
 
     def loadSolid(self):
@@ -134,10 +142,15 @@ class Snappy(object):
         path_filename=os.path.abspath(__file__)
         sourcedir = os.path.split(path_filename)[0]
 
-        template = os.path.join(*[sourcedir,"..","templates","surfaceFeatureExtractDict"])
+        if self._edgesolid:
+            template = os.path.join(*[sourcedir,"..","templates","surfaceFeatureExtractDict_WithEdgeSolid"])
+        else:
+            template = os.path.join(*[sourcedir,"..","templates","surfaceFeatureExtractDict"])
         target   = os.path.join(self._systemdir,"surfaceFeatureExtractDict")
 
         replacedict = {"{STLFILENAME}"    :  self.writeSTLFilename}
+        if self._edgesolid:
+            replacedict["{EDGESTLFILENAME}"] = self.writeEdgeSTLFilename
 
         hf.copyfile(template,target,replacedict)
 
@@ -170,12 +183,22 @@ class Snappy(object):
         target.write("    "+self._refsolid.getSTLName()+"\n")
         print("writeRefSTLFilename: "+self._refsolid.getSTLName())
 
+    def writeEdgeSTLFilename(self,target):
+        self.checksolid("writeEdgeSTLFilename")
+        target.write("    "+self._edgesolid.getSTLName()+"\n")
+        print("writeEdgeSTLFilename: "+self._edgesolid.getSTLName())
+
     def writeSTLeMesh(self,target):
         self.checksolid("writeSTLeMesh")
         filename = self._solid.getSTLName()
         filename = os.path.splitext(filename)[0]+".eMesh"
         target.write("          file \""+filename+"\";\n")
 
+    def writeEdgeSTLeMesh(self,target):
+        self.checksolid("writeEdgeSTLeMesh")
+        filename = self._edgesolid.getSTLName()
+        filename = os.path.splitext(filename)[0]+".eMesh"
+        target.write("          file \""+filename+"\";\n")
 
     def writeSTLObjectName(self,target):
         self.checksolid("writeSTLObjectName")
@@ -203,14 +226,18 @@ class Snappy(object):
         path_filename=os.path.abspath(__file__)
         sourcedir = os.path.split(path_filename)[0]
 
-        template = os.path.join(*[sourcedir,"..","templates","snappyHexMeshDict"])
+        if self._edgesolid:
+            template = os.path.join(*[sourcedir,"..","templates","snappyHexMeshDict_WithEdgeSolid"])
+        else:
+            template = os.path.join(*[sourcedir,"..","templates","snappyHexMeshDict"])
         target   = os.path.join(self._systemdir,"snappyHexMeshDict")
 
-        replacedict = {"{STLFILENAME}"    :  self.writeSTLFilename,
-                       "{STLREFFILENAME}" :  self.writeRefSTLFilename,
-                       "{STLOBJECTNAME}"  :  self.writeSTLObjectName,
-                       "{REFINEMENTBOX}"  :  self.writeRefinementBox,
-                       "{STLEMESHNAME}"   :  self.writeSTLeMesh}
+        replacedict = {"{STLFILENAME}"      :  self.writeSTLFilename,
+                       "{STLREFFILENAME}"   :  self.writeRefSTLFilename,
+                       "{STLOBJECTNAME}"    :  self.writeSTLObjectName,
+                       "{REFINEMENTBOX}"    :  self.writeRefinementBox,
+                       "{STLEMESHNAME}"     :  self.writeSTLeMesh,
+                       "{EDGESTLEMESHNAME}" : self.writeEdgeSTLeMesh}
 
         hf.copyfile(template,target,replacedict)
 

@@ -228,6 +228,7 @@ class ProjectManager(object):
 
                project.setSolidFile(gCFG.getGeometrySTL())
                project.setRefSolidFile(gCFG.getRefGeometrySTL())
+               project.setEdgeSolidFile(gCFG.getEdgeGeometrySTL())
                project.setObjeScaling(gCFG.getScale())
                project.setObjeRotX(sCFG.getXrotation())
                project.setObjeRotY(sCFG.getYrotation())
@@ -414,23 +415,29 @@ class geomCFG(object):
         import os
         self._geometrySTL = ""
         self._refGeometrySTL = ""
+        self._edgeGeometrySTL = ""
         self._scale = 1.0
         self.readCFG(os.path.join(directory,cfgfile))
     def __str__(self):
         string  =  str(self._scale)+" scale"
         string += ", "+self._geometrySTL
         string += ", "+self._refGeometrySTL
+        if self._edgeGeometrySTL:
+            string += ", "+self._edgeGeometrySTL
         return string
     def getGeometrySTL(self):
         return self._geometrySTL
     def getRefGeometrySTL(self):
         return self._refGeometrySTL
+    def getEdgeGeometrySTL(self):
+        return self._edgeGeometrySTL
     def getScale(self):
         return self._scale
     def __eq__(self,other):
-        if (     self._geometrySTL    == other.getGeometrySTL()
-             and self._refGeometrySTL == other.getRefGeometrySTL()
-             and self._scale          == other.getScale()):
+        if (     self._geometrySTL     == other.getGeometrySTL()
+             and self._refGeometrySTL  == other.getRefGeometrySTL()
+             and self._edgeGeometrySTL == other.getEdteGeometrySTL()
+             and self._scale           == other.getScale()):
             return True
         else:
             return False
@@ -449,6 +456,7 @@ class geomCFG(object):
          self._scale = float(hf.read_key(config,'GEOMETRY','scale',1.0))
          self._geometrySTL = hf.read_key(config,'GEOMETRY','solid',"")
          self._refGeometrySTL = hf.read_key(config,'GEOMETRY','refsolid',"")
+         self._edgeGeometrySTL = hf.read_key(config,'GEOMETRY','edgesolid',"")
       else:
          print("no geometry section found")
 
