@@ -456,7 +456,7 @@ class geomCFG(object):
          self._scale = float(hf.read_key(config,'GEOMETRY','scale',1.0))
          self._geometrySTL = hf.read_key(config,'GEOMETRY','solid',"")
          self._refGeometrySTL = hf.read_key(config,'GEOMETRY','refsolid',"")
-         self._edgeGeometrySTL = hf.read_key(config,'GEOMETRY','edgesolid',"")
+         self._edgeGeometrySTL = hf.read_key(config,'GEOMETRY','edgesolid',"",True)
       else:
          print("no geometry section found")
 
