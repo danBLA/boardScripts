@@ -176,25 +176,46 @@ class Solid(object):
         stl.write("endsolid\n")
 
     def repairAndWriteToFile(self,filename,directory="stl_final"):
+        import tempfile
         if self._freeze:
            print("ERROR: Solid can not be changed!")
            print("       (function repair())")
            hf.flush_output()
            hf.exit(1)
+
         path_filename=os.path.abspath(__file__)
         executablesDir = os.path.split(path_filename)[0]
-        self.writeToFile("tmp.stl",".")
+
+        # create and open temporary file
+        mytempfile = tempfile.NamedTemporaryFile(suffix='.stl',dir='.')
+        # get name of file so we have a name for a temporary file
+        filename_start = os.path.split(mytempfile.name)[-1]
+        # close the file (which will delete it)
+        mytempfile.close()
+        print("creating temporary stl: "+str(filename_start))
+
+        self.writeToFile(filename_start,".")
+
+        # create and open temporary file
+        mytempfile = tempfile.NamedTemporaryFile(suffix='.stl',dir='.')
+        # get name of file so we have a name for a temporary file
+        filename_next = os.path.split(mytempfile.name)[-1]
+        # close the file (which will delete it)
+        mytempfile.close()
+        print("creating temporary stl: "+str(filename_next))
+
         command = []
         command.append(os.path.join(executablesDir,"admesh"))
         command.append("-nufdv")
-        command.append("--write-ascii-stl=tmp1.stl")
-        command.append("tmp.stl")
+        command.append("--write-ascii-stl="+filename_next)
+        command.append(filename_start)
 
         hf.run(command)
 
+        print("creating stl: "+str(os.path.join(directory,filename)))
         stl = open(os.path.join(directory,filename),'w')
 
-        for line in open("tmp1.stl"):
+        for line in open(filename_next):
             elements = line.lower().split()
             if elements[0] == "solid":
                stl.write("solid "+self._name+"\n")
@@ -205,10 +226,13 @@ class Solid(object):
 
         stl.close()
 
-        os.remove("tmp.stl")
-        os.remove("tmp1.stl")
+        print("removing temporary file: "+filename_start)
+        os.remove(filename_start)
+        print("removing temporary file: "+filename_next)
+        os.remove(filename_next)
 
     def repair(self):
+        import tempfile
         if self._freeze:
            print("ERROR: Solid can not be changed!")
            print("       (function repair())")
@@ -216,17 +240,35 @@ class Solid(object):
            hf.exit(1)
         path_filename=os.path.abspath(__file__)
         executablesDir = os.path.split(path_filename)[0]
-        self.writeToFile("tmp.stl",".")
+
+        # create and open temporary file
+        mytempfile = tempfile.NamedTemporaryFile(suffix='.stl',dir='.')
+        # get name of file so we have a name for a temporary file
+        filename_start = os.path.split(mytempfile.name)[-1]
+        # close the file (which will delete it)
+        mytempfile.close()
+        print("creating temporary stl: "+str(filename_start))
+
+        self.writeToFile(filename_start,".")
+
+        # create and open temporary file
+        mytempfile = tempfile.NamedTemporaryFile(suffix='.stl',dir='.')
+        # get name of file so we have a name for a temporary file
+        filename_next = os.path.split(mytempfile.name)[-1]
+        # close the file (which will delete it)
+        mytempfile.close()
+        print("creating temporary stl: "+str(filename_next))
+
         command = []
         command.append(os.path.join(executablesDir,"admesh"))
         command.append("-nufdv")
-        command.append("--write-ascii-stl=tmp1.stl")
-        command.append("tmp.stl")
+        command.append("--write-ascii-stl="+filename_next)
+        command.append(filename_start)
 
         hf.run(command)
 
         self.reset()
-        for line in open("tmp1.stl"):
+        for line in open(filename_next):
             elements = line.lower().split()
             if elements[0] == "solid":
                 self._name = elements[1]
@@ -235,8 +277,10 @@ class Solid(object):
             if elements[0] == "vertex":
                 self.addPoint(elements[1],elements[2],elements[3])
 
-        os.remove("tmp.stl")
-        os.remove("tmp1.stl")
+        print("removing temporary file: "+filename_start)
+        os.remove(filename_start)
+        print("removing temporary file: "+filename_next)
+        os.remove(filename_next)
 
 
 def createSolidsFromSTL(filename,directory="geometries"):
