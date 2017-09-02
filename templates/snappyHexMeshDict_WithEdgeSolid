@@ -91,6 +91,10 @@ castellatedMeshControls
          {STLEMESHNAME}
          levels ((0 8));
       }
+      {
+         {EDGESTLEMESHNAME}
+         levels ((0 8));
+      }
     );
 
 

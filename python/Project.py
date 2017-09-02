@@ -118,14 +118,14 @@ class Project(object):
        self._snappy.copytemplateDict("fvSchemes")
        self._snappy.copytemplateDict("fvSolution")
        self._snappy.copytemplateDict("transportProperties","constant")
-       self._snappy.copytemplateDict("RASProperties","constant")
+       self._snappy.copytemplateDict("turbulenceProperties","constant")
 
        self._simple.writeInitialAndBCinclude()
        self._simple.copytemplateDict("controlDict")
        self._simple.copytemplateDict("fvSchemes")
        self._simple.copytemplateDict("fvSolution")
        self._simple.copytemplateDict("transportProperties","constant")
-       self._simple.copytemplateDict("RASProperties","constant")
+       self._simple.copytemplateDict("turbulenceProperties","constant")
 
    def checkFolders(self):
        self.checkObjects()
