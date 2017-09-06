@@ -70,9 +70,9 @@ SIMPLE
     // desired residual (iterations will not stop)
     residualControl
     {
-        p               5e-6;
-        U               1e-7;
-        "(k|omega)" 1e-7;
+        p               5e-5;
+        U               1e-5;
+        "(k|omega)" 1e-5;
     }
 }
 
