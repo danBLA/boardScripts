@@ -3,16 +3,17 @@ import math
 import Solid
 import help_functions as hf
 class Domain(object):
-    def __init__(self,snappydir):
+    def __init__(self,snappydir,logger):
         self._solid = None
+        self._logger = logger
 
         self._facXmin = 19.0
         self._facXmax =  3.3
         self._facY    =  1.5
         self._facZ    =  1.0
 
-        #self._nx = 34
         self._nx = 30
+        #self._nx = 28
         self._ny = 0
         self._nz = 0
 

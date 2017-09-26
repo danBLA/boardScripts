@@ -1,13 +1,14 @@
 import Project
 import help_functions as hf
 class ProjectManager(object):
-    def __init__(self):
+    def __init__(self,logger):
         self._configurations = []
         self._geometries = []
         self._selected_geometries = []
         self._selected_configurations = []
         self._projectlist = []
         self._active_projectlist = []
+        self._logger = logger
 
     def searchCFGfiles(self,directory):
         from os import listdir
@@ -224,7 +225,7 @@ class ProjectManager(object):
     def createProjects(self):
        for sCFG in self._selected_configurations:
            for gCFG in self._selected_geometries:
-               project = Project.Project()
+               project = Project.Project(self._logger)
 
                project.setSolidFile(gCFG.getGeometrySTL())
                project.setRefSolidFile(gCFG.getRefGeometrySTL())

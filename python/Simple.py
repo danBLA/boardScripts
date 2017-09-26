@@ -2,8 +2,9 @@ import Solid
 import os
 import help_functions as hf
 class Simple(object):
-    def __init__(self,simpledir,snappydir):
+    def __init__(self,simpledir,snappydir,logger):
         self._solid = None
+        self._logger = logger
 
         self._snappydir     = snappydir
         self._simpledir     = simpledir
@@ -63,16 +64,43 @@ class Simple(object):
         return os.path.isfile(self._statusfilename)
 
     def setGridCopied(self,boolean=True):
+        self._logger.info("Mesh copied : "+str(boolean))
         self._gridCopied = boolean
         self.writeStatus()
 
     def setSimulationStarted(self,boolean=True):
+        self._logger.info("Simulation started : "+str(boolean))
         self._simulationStarted = boolean
         self.writeStatus()
 
     def setSimulationFinished(self,boolean=True):
+        self._logger.info("Simulation finished : "+str(boolean))
         self._simulationFinished = boolean
         self.writeStatus()
+
+    def runSimulation(self):
+        if self._simulationFinished:
+            self._logger.info("runSimulation: simulation finished already, skipping...")
+        else:
+            self._logger.info("run simulation...")
+            meshDir = os.path.join(*[self._simpledir,"constant","polyMesh"])
+
+            if not hf.folder_exists(meshDir):
+                self._logger.error("PolyMesh folder does not exist!")
+                self._logger.error(self.statusInfo())
+
+            if self._simulationStarted:
+                self.setSimulationStarted(False)
+
+            self.removePostProcessingFolder()
+
+            self.setSimulationStarted()
+            hf.run(["simpleFoam"],self._simpledir)
+            self.setSimulationFinished()
+
+    def removePostProcessingFolder(self):
+        path = os.path.join(self._simpledir,"postProcessing")
+        hf.remove_folder(path)
 
     def createFolders(self):
         for item in self._folderlist:

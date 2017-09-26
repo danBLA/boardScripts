@@ -2,10 +2,11 @@ import Solid
 import os
 import help_functions as hf
 class Snappy(object):
-    def __init__(self,snappydir):
+    def __init__(self,snappydir,logger):
         self._solid     = None
         self._refsolid  = None
         self._edgesolid = None
+        self._logger    = logger
 
         self._snappydir     = snappydir
         self._constantdir   = os.path.join(snappydir,"constant")

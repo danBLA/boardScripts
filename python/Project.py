@@ -5,11 +5,12 @@ import Solid
 import Domain
 import Snappy
 import Simple
+import force
 
 import help_functions as hf
 
 class Project(object):
-   def __init__(self):
+   def __init__(self,logger):
        self._solid            = None
        self._refsolid         = None
        self._edgesolid        = None
@@ -28,19 +29,20 @@ class Project(object):
        self._snappy           = None
        self._domain           = None
        self._simple           = None
+       self._logger           = logger
 
    def prepare(self):
        # create project directory name
        self.createProjectName()
 
        # create snappy and domain object
-       self._snappy = Snappy.Snappy(self._snappyHexMeshDir)
-       self._domain = Domain.Domain(self._snappyHexMeshDir)
-       self._simple = Simple.Simple(self._simpleFoamDir,self._snappyHexMeshDir)
+       self._snappy = Snappy.Snappy(self._snappyHexMeshDir,self._logger)
+       self._domain = Domain.Domain(self._snappyHexMeshDir,self._logger)
+       self._simple = Simple.Simple(self._simpleFoamDir,self._snappyHexMeshDir,self._logger)
 
        # read/load solid
        if self._snappy.solidWritten() and not self._solidfile:
-           print "Loading Solid from snappyHexMesh"
+           self._logger.info("Loading Solid from snappyHexMesh")
            [self._solid, self._refsolid] = self._snappy.loadSolid()
        else:
            # check if solid file exists
@@ -291,3 +293,14 @@ class Project(object):
            return False
    def __ne__(self,other):
        return (not self.__eq__(other))
+
+   def runSolver(self):
+       self._simple.runSimulation()
+
+   def forces(self,outerLogFile):
+       header = []
+       header.append("SolidFile: "+self._solidfile)
+       header.append("X: "+str(self._rotX)+", Y: "+str(self._rotY)+", Z: "+str(self._rotZ))
+
+       forcesFile = os.path.join(*[self._simpleFoamDir,"postProcessing","forces","0","forces.dat"])
+       force.printAndLogForce(forcesFile, header, self._logger, outerLogFile)
