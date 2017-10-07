@@ -300,7 +300,7 @@ class Project(object):
    def forces(self,outerLogFile):
        header = []
        header.append("SolidFile: "+self._solidfile)
-       header.append("X: "+str(self._rotX)+", Y: "+str(self._rotY)+", Z: "+str(self._rotZ))
+       header.append("X: "+str(self._rotX)+", Y: "+str(self._rotY)+", Z: "+str(self._rotZ)+", speed: "+str(self._speedknots)+" knots")
 
        forcesFile = os.path.join(*[self._simpleFoamDir,"postProcessing","forces","0","forces.dat"])
        force.printAndLogForce(forcesFile, header, self._logger, outerLogFile)
