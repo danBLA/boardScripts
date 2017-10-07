@@ -1,21 +1,36 @@
 def run(command,directory=""):
    import os
+   import mycommand
+   import tempfile
    cwd = ""
    if directory:
        cwd = os.getcwd()
        os.chdir(directory)
 
-   try:
-      import subprocess as sp
-      returnvalue = sp.call(command)
-   except ImportError:
-      import os
-      returnvalue = os.WEXITSTATUS(os.system(" ".join(command)))
+   # create and open temporary file
+   mytempfile = tempfile.NamedTemporaryFile(suffix='.txt',dir='.')
+   # get name of file so we have a name for a temporary file
+   filename_start = os.path.split(mytempfile.name)[-1]
+   # close the file (which will delete it)
+   mytempfile.close()
+   print("creating temporary txt-file: "+str(filename_start))
+
+   mycmd = mycommand.Command(" ".join(command),filename_start)
+   status, output, error = mycmd.run(timeout=None)
+   #try:
+   #   import subprocess as sp
+   #   returnvalue = sp.call(command)
+   #except ImportError:
+   #   import os
+   #   returnvalue = os.WEXITSTATUS(os.system(" ".join(command)))
+
+   print("removing temporary txt-file: "+str(filename_start))
+   remove_file(filename_start)
 
    if directory:
        os.chdir(cwd)
 
-   return returnvalue
+   return status
 
 def exit(code):
    """"This function exits python."""
@@ -126,6 +141,11 @@ def remove_folder(path,verbose=None):
       if verbose:
          print("could not remove folder: "+path)
          flush_output()
+
+def remove_file(filename):
+    import os
+    if os.path.exists(filename):
+       os.remove(filename)        
 
 def query_yes_no(question, default="yes"):
     import sys

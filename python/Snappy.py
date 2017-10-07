@@ -282,6 +282,7 @@ class Snappy(object):
            print("         -> trying to first write solid...")
            self.writeSolid()
        if not hf.run(["surfaceFeatureExtract"],self._snappydir) == 0:
+           print("ERROR  : surfaceFeatureExtract")
            hf.exit(1)
        else:
            self.setFeatuesExtracted()
