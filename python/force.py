@@ -1,4 +1,5 @@
 import os
+import datetime
 def printAndLogForce(filename, header, logger=None, outfile=None):
 
     if not os.path.isfile(filename):
@@ -43,6 +44,7 @@ def printAndLogForce(filename, header, logger=None, outfile=None):
             logger.info("")
             for line in header:
                 logger.info(line)
+            logger.info("date & time: "+str(unicode(datetime.datetime.now())))
             logger.info("Last lime iteration number: "+str(int(float(mylist[0]))))
             logger.info("Forces [dN]")
             logger.info(str(forces[0])+", "+str(forces[1])+", "+str(forces[2]))
@@ -53,6 +55,7 @@ def printAndLogForce(filename, header, logger=None, outfile=None):
                 outerLogFile.write("\n")
                 for line in header:
                     outerLogFile.write(line+"\n")
+                outerLogFile.write("date & time: "+str(unicode(datetime.datetime.now())))
                 outerLogFile.write("Last lime iteration number: "+str(int(float(mylist[0])))+"\n")
                 outerLogFile.write("Forces [dN]\n")
                 outerLogFile.write(str(forces[0])+", ")
