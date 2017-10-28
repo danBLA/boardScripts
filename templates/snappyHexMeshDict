@@ -152,8 +152,8 @@ castellatedMeshControls
     // NOTE: This point should never be on a face, always inside a cell, even
     // after refinement.
     //locationInMesh ( 1.0 -0.25 -0.85);
-    locationInMesh ( 1.0 -0.30 -0.95);
-
+    //locationInMesh ( 1.0 -0.30 -0.95);
+    {POINTOUTSIDESOLID}
 
     // Whether any faceZones (as specified in the refinementSurfaces)
     // are only on the boundary of corresponding cellZones or also allow

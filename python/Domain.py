@@ -12,6 +12,8 @@ class Domain(object):
         self._facY    =  1.5
         self._facZ    =  1.0
 
+        self._pointOutsideSolid = [0.0, 0.0, 0.0]
+
         #self._nx = 30
         self._nx = 28
         self._ny = 0
@@ -95,6 +97,12 @@ class Domain(object):
 
         self.adjustDomainNX(self._nx)
 
+        self._pointOutsideSolid[0] = (self._xmin + solid.getXmin())*0.5
+        self._pointOutsideSolid[1] = (self._ymin + solid.getYmin())*0.5
+        self._pointOutsideSolid[2] = (self._zmin + solid.getZmin())*0.5
+
+    def getPointOutsideSolid(self):
+        return self._pointOutsideSolid
 
     def checksolid(self,whichfunction):
         if not self._solid:

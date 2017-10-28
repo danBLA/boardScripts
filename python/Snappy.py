@@ -24,8 +24,15 @@ class Snappy(object):
         self._meshCreated       = False
         self._meshChecked       = False
 
+        self._pointOutsideSolid = [0.0 , 0.0 , 0.0]
+
         if self.statusFileExists():
             self.readStatus()
+
+    def setPointOutsideSolid(self,point):
+        self._pointOutsideSolid[0] = point[0]
+        self._pointOutsideSolid[1] = point[1]
+        self._pointOutsideSolid[2] = point[2]
 
     def readStatus(self):
       import ConfigParser
@@ -174,6 +181,10 @@ class Snappy(object):
         if not self.statusFileExists():
             self.writeStatus()
 
+    def writePointOutsideSolid(self,target):
+        target.write("         locationInMesh ( "+str(self._pointOutsideSolid[0])+" "+str(self._pointOutsideSolid[1])+" "+str(self._pointOutsideSolid[2])+");\n")
+        print("Point outside solid: "+str(self._pointOutsideSolid[0])+" "+str(self._pointOutsideSolid[1])+" "+str(self._pointOutsideSolid[2]))
+
     def writeSTLFilename(self,target):
         self.checksolid("writeSTLFilename")
         target.write("    "+self._solid.getSTLName()+"\n")
@@ -238,7 +249,8 @@ class Snappy(object):
                        "{STLOBJECTNAME}"    :  self.writeSTLObjectName,
                        "{REFINEMENTBOX}"    :  self.writeRefinementBox,
                        "{STLEMESHNAME}"     :  self.writeSTLeMesh,
-                       "{EDGESTLEMESHNAME}" : self.writeEdgeSTLeMesh}
+                       "{EDGESTLEMESHNAME}" :  self.writeEdgeSTLeMesh,
+                       "{POINTOUTSIDESOLID}":  self.writePointOutsideSolid}
 
         hf.copyfile(template,target,replacedict)
 

@@ -112,6 +112,8 @@ class Project(object):
        # if the solid has been loaded
        self._domain.setsolid(self._solid)
 
+       self._snappy.setPointOutsideSolid(self._domain.getPointOutsideSolid())
+
        self._domain.writeBlockDict()
        self._snappy.writeExtractFeatureDict()
        self._snappy.writeSnappyHexMeshDict()
