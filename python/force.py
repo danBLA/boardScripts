@@ -55,7 +55,7 @@ def printAndLogForce(filename, header, logger=None, outfile=None):
                 outerLogFile.write("\n")
                 for line in header:
                     outerLogFile.write(line+"\n")
-                outerLogFile.write("date & time: "+str(unicode(datetime.datetime.now())))
+                outerLogFile.write("date & time: "+str(unicode(datetime.datetime.now()))+"\n")
                 outerLogFile.write("Last lime iteration number: "+str(int(float(mylist[0])))+"\n")
                 outerLogFile.write("Forces [dN]\n")
                 outerLogFile.write(str(forces[0])+", ")
