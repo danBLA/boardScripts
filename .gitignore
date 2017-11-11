@@ -1,2 +1,14 @@
 *.swp
 *.pyc
+
+forces.log
+geometries
+runSims.ida.1.sh
+runSims.ida.2.sh
+runSims.parade.1.sh
+runSims.parade.2.sh
+runSims.parade.3.sh
+runSims.tessin.1.sh
+runSims.tessin.2.sh
+runSims.tessin.3.sh
+simulations
