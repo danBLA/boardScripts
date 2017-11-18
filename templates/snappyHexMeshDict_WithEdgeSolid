@@ -113,12 +113,12 @@ castellatedMeshControls
         {STLFILENAME}
         {
             // Surface-wise min and max refinement level
-            level (2 6);
+            level (2 7);
         }
     }
 
     // Resolve sharp angles on fridges
-    resolveFeatureAngle 5;
+    resolveFeatureAngle 30;
 
 
     // Region-wise refinement
