@@ -29,7 +29,8 @@ FoamFile
         //includedAngle   150;
         //includedAngle   170;
         //includedAngle   175;
-        includedAngle   178;
+        //includedAngle   178;
+        includedAngle   80;
     }
 
     // Write options
