@@ -7,15 +7,18 @@ class Domain(object):
         self._solid = None
         self._logger = logger
 
-        self._facXmin = 19.0
+        self._facXmin = 10.0
         self._facXmax =  3.3
-        self._facY    =  1.5
-        self._facZ    =  1.0
+        self._facY    = 10.0
+        self._facZ    =  4.0
+        self._facXmin /= 2.0
+        self._facXmax /= 2.0
+        self._facY    /= 2.0
+        self._facZ    /= 2.0
 
         self._pointOutsideSolid = [0.0, 0.0, 0.0]
 
-        #self._nx = 30
-        self._nx = 28
+        self._nx = 30
         self._ny = 0
         self._nz = 0
 
@@ -92,14 +95,14 @@ class Domain(object):
         self._ymin = solid.getYmin()-self._facY   *dy
         self._ymax = solid.getYmax()+self._facY   *dy
 
-        self._zmin = solid.getZmin()-self._facZ   *dz
+        self._zmin = solid.getZmin() + 0.01 #-self._facZ   *dz
         self._zmax = solid.getZmax()+self._facZ   *dz
 
         self.adjustDomainNX(self._nx)
 
-        self._pointOutsideSolid[0] = (self._xmin + solid.getXmin())*0.5
-        self._pointOutsideSolid[1] = (self._ymin + solid.getYmin())*0.5
-        self._pointOutsideSolid[2] = (self._zmin + solid.getZmin())*0.5
+        self._pointOutsideSolid[0] = max(self._xmin+abs(self._xmin - solid.getXmin())*0.5,self._xmin)
+        self._pointOutsideSolid[1] = max(self._ymin+abs(self._ymin - solid.getYmin())*0.5,self._ymin)
+        self._pointOutsideSolid[2] = max(self._zmin+abs(self._zmin - solid.getZmin())*0.5,self._zmin)
 
     def getPointOutsideSolid(self):
         return self._pointOutsideSolid
@@ -127,9 +130,10 @@ class Domain(object):
         self._ny = int(2*ny)
 
         cz = (self._zmin + self._zmax)/2.0
+        # same formula as for y-dir
         nz = math.ceil((self._zmax - cz)/dx)
-        self._zmin = cz - nz*dx
-        self._zmax = cz + nz*dx
+        # but keep zmin
+        self._zmax = cz + 2*nz*dx
         self._nz = int(2*nz)
 
     def meshCreated(self):

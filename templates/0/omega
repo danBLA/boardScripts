@@ -38,6 +38,12 @@ boundaryField
     }
 
     #include "include/frontBackTopBottomPatches"
+
+    back
+    {
+        type            omegaWallFunction;
+        value           $internalField;
+    }
 }
 
 

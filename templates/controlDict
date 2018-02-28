@@ -23,7 +23,7 @@ startTime       0;
 
 stopAt          endTime;
 
-endTime         500;
+endTime         5000;
 
 deltaT          1;
 
@@ -58,8 +58,8 @@ functions
         UName               U;
         rho                 rhoInf;
         log                 true;
-        rhoInf              1000;
-        CofR                (0.4974612746 -0.01671895744 0.125);
+        rhoInf              1.205;
+        CofR                (0.0 0.0 0.0);
     }
 }
 

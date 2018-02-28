@@ -39,6 +39,11 @@ boundaryField
     }
 
     #include "include/frontBackTopBottomPatches"
+
+    back
+    {
+        type            zeroGradient;
+    }
 }
 
 // ************************************************************************* //

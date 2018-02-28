@@ -1,5 +1,6 @@
 import Solid
 import os
+import shutil
 import help_functions as hf
 class Snappy(object):
     def __init__(self,snappydir,logger):
@@ -7,7 +8,12 @@ class Snappy(object):
         self._refsolid  = None
         self._edgesolid = None
         self._logger    = logger
+        self.castMesh   = True
+        self.snap       = True
+        self.add_layers      = True
+        self._finalSnappyDictFile = ""
 
+        self._snappyFiles   = []
         self._snappydir     = snappydir
         self._constantdir   = os.path.join(snappydir,"constant")
         self._systemdir     = os.path.join(snappydir,"system")
@@ -185,6 +191,24 @@ class Snappy(object):
         target.write("         locationInMesh ( "+str(self._pointOutsideSolid[0])+" "+str(self._pointOutsideSolid[1])+" "+str(self._pointOutsideSolid[2])+");\n")
         print("Point outside solid: "+str(self._pointOutsideSolid[0])+" "+str(self._pointOutsideSolid[1])+" "+str(self._pointOutsideSolid[2]))
 
+    def writeCastellatedMesh(self,target):
+        if self.castMesh:
+            target.write("castellatedMesh true;\n")
+        else:
+            target.write("castellatedMesh false;\n")
+
+    def writeSnap(self,target):
+        if self.snap:
+            target.write("snap true;\n")
+        else:
+            target.write("snap false;\n")
+
+    def addLayers(self,target):
+        if self.add_layers:
+            target.write("addLayers true;\n")
+        else:
+            target.write("addLayers false;\n")
+
     def writeSTLFilename(self,target):
         self.checksolid("writeSTLFilename")
         target.write("    "+self._solid.getSTLName()+"\n")
@@ -250,9 +274,28 @@ class Snappy(object):
                        "{REFINEMENTBOX}"    :  self.writeRefinementBox,
                        "{STLEMESHNAME}"     :  self.writeSTLeMesh,
                        "{EDGESTLEMESHNAME}" :  self.writeEdgeSTLeMesh,
-                       "{POINTOUTSIDESOLID}":  self.writePointOutsideSolid}
+                       "{POINTOUTSIDESOLID}":  self.writePointOutsideSolid,
+                       "{CASTELLATEDMESH}"  :  self.writeCastellatedMesh,
+                       "{SNAP}"             :  self.writeSnap,
+                       "{ADDLAYERS}"        :  self.addLayers                }
 
-        hf.copyfile(template,target,replacedict)
+        self._finalSnappyDictFile = os.path.join(self._systemdir,"snappyHexMeshDict")
+
+        self.castMesh   = True
+        self.snap       = True
+        self.add_layers = False
+
+        filename = target+".castAndSnap"
+        hf.copyfile(template,filename,replacedict)
+        self._snappyFiles.append(filename)
+
+        self.castMesh   = False
+        self.snap       = False
+        self.add_layers = True
+
+        filename = target+".addLayer"
+        hf.copyfile(template,filename,replacedict)
+        self._snappyFiles.append(filename)
 
     def meshCreated(self):
         return self._meshCreated
@@ -310,7 +353,14 @@ class Snappy(object):
        hf.remove_folder(os.path.join(self._snappydir,"2"))
        hf.remove_folder(os.path.join(self._snappydir,"3"))
 
-       if not hf.run(["snappyHexMesh"],self._snappydir) == 0:
+       if len(self._snappyFiles) > 0:
+           for sfile in self._snappyFiles:
+               shutil.copyfile(sfile,self._finalSnappyDictFile)
+               if not hf.run(["snappyHexMesh"],self._snappydir) == 0:
+                   print("ERROR while writing snappyHexMesh")
+                   print("snappy dict created from: "+sfile)
+                   hf.exit(1)
+       elif not hf.run(["snappyHexMesh"],self._snappydir) == 0:
            print("ERROR while writing snappyHexMesh")
            hf.exit(1)
        else:

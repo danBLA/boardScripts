@@ -27,9 +27,15 @@ boundaryField
         value           uniform 0;
     }
 
-    "(front|back|topAndBottom|inlet|outlet)"
+    "(front|topAndBottom|inlet|outlet)"
     {
         type            calculated;
+        value           uniform 0;
+    }
+
+    back
+    {
+        type            nutkWallFunction;
         value           uniform 0;
     }
 }

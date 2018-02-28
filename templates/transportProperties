@@ -17,6 +17,7 @@ FoamFile
 
 transportModel Newtonian;
 
-nu              nu [0 2 -1 0 0 0 0] 1e-06;    // kinematic viscosity
+//nu              nu [0 2 -1 0 0 0 0] 1e-06;    // kinematic viscosity (water)
+nu              nu [0 2 -1 0 0 0 0] 15.11e-06;    // kinematic viscosity
 
 // ************************************************************************* //

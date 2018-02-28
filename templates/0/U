@@ -39,6 +39,12 @@ boundaryField
     }
 
     #include "include/frontBackTopBottomPatches"
+
+    back
+    {
+        type            fixedValue;
+        value           $internalField;
+    }
 }
 
 

@@ -15,9 +15,9 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 // Which of the steps to run
-castellatedMesh true;
-snap            true;
-addLayers       true;
+castellatedMesh {CASTELLATEDMESH};
+snap            {SNAP};
+addLayers       {ADDLAYERS};
 
 // Geometry. Definition of all surfaces. All surfaces are of class
 // searchableSurface.
@@ -65,7 +65,7 @@ castellatedMeshControls
     // Note that this is the number of cells before removing the part which
     // is not 'visible' from the keepPoint. The final number of cells might
     // actually be a lot less.
-    maxGlobalCells 3000000;
+    maxGlobalCells 5000000;
 
     // The surface refinement loop might spend lots of iterations refining just
     // a few cells. This setting will cause refinement to stop if <=
@@ -76,7 +76,7 @@ castellatedMeshControls
     // Number of buffer layers between different levels.
     // 1 means normal 2:1 refinement restriction, larger means slower
     // refinement.
-    nCellsBetweenLevels 3;
+    nCellsBetweenLevels 1;
 
 
 
@@ -89,7 +89,7 @@ castellatedMeshControls
     (
       {
          {STLEMESHNAME}
-         levels ((0 8));
+         levels ((2 6));
       }
     );
 
@@ -109,7 +109,7 @@ castellatedMeshControls
         {STLFILENAME}
         {
             // Surface-wise min and max refinement level
-            level (2 7);
+            level (1 6);
         }
     }
 
@@ -135,7 +135,7 @@ castellatedMeshControls
     {STLREFFILENAME}
 	{
 	     mode inside;
-             levels ((0 5));
+             levels ((0 4));
              //levels ((0 6));  // can be set if there are cells inside board
 	}
 
@@ -204,7 +204,7 @@ addLayersControls
 
     // Expansion factor for layer mesh
     //expansionRatio 1.1;
-    expansionRatio 1.4; // new change
+    expansionRatio 1.2; // new change
 
     // Wanted thickness of final added cell layer. If multiple layers
     // is the thickness of the layer furthest away from the wall.
@@ -213,14 +213,16 @@ addLayersControls
     // See relativeSizes parameter.
     //finalLayerThickness 0.7;
     //finalLayerThickness 0.4;
-    finalLayerThickness 0.2; // new change
+    //finalLayerThickness 0.2;
+    finalLayerThickness 0.8; // new change 24.1.2018
 
     // Minimum thickness of cell layer. If for any reason layer
     // cannot be above minThickness do not add layer.
     // Relative to undistorted size of cell outside layer.
     // See relativeSizes parameter.
     //minThickness 0.25;
-    minThickness 0.05; // new change
+    //minThickness 0.05;
+    minThickness 0.55; // new change 24.1.2018
 
     // If points get not extruded do nGrow layers of connected faces that are
     // also not grown. This helps convergence of the layer addition process
@@ -278,13 +280,13 @@ meshQualityControls
     maxNonOrtho 65;
 
     //- Max skewness allowed. Set to <0 to disable.
-    maxBoundarySkewness 20;
-    maxInternalSkewness 4;
+    maxBoundarySkewness 4;
+    maxInternalSkewness 3;
 
     //- Max concaveness allowed. Is angle (in degrees) below which concavity
     //  is allowed. 0 is straight face, <0 would be convex face.
     //  Set to 180 to disable.
-    maxConcave 80;
+    maxConcave 120;
 
     //- Minimum pyramid volume. Is absolute volume of cell pyramid.
     //  Set to a sensible fraction of the smallest cell volume expected.
